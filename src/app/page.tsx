@@ -5,7 +5,7 @@ import { JSX, useEffect, useState } from 'react';
 
 export default function Home(): JSX.Element {
   const [products, setProducts] = useState<string[]>([]);
-  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -13,12 +13,11 @@ export default function Home(): JSX.Element {
     script.async = true;
     script.onload = () => {
       window.JazzAuth?.init({
-        clientId: 'tamasha',
+        clientId: 'tamasha',  // or 'cricket'
         containerId: 'jazz-auth-container',
         buttonColor: '#1d4ed8',
-        onLogin: (t) => {
-          setToken(t);
-          fetchProducts('tamasha', t).then(setProducts).catch(console.error);
+        onLogin: () => {
+          loadSession();  // Trigger reload
         },
       });
     };
@@ -26,16 +25,25 @@ export default function Home(): JSX.Element {
     return () => script.remove();
   }, []);
 
+  const loadSession = async () => {
+    setLoading(true);
+    const token = await getToken();
+    if (token) {
+      const data = await fetchProducts('tamasha', token);  // or 'cricket'
+      setProducts(data);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const load = async () => {
-      const t = await getToken();
-      setToken(t);
-      if (t) fetchProducts('tamasha', t).then(setProducts).catch(console.error);
-    };
-    load();
+    loadSession();
   }, []);
 
-  if (token) {
+  if (loading) {
+    return <div className="p-8 text-center">Checking session...</div>;
+  }
+
+  if (products.length > 0) {
     return (
       <div className="p-8 max-w-md mx-auto bg-blue-50 rounded-xl">
         <h1 className="text-2xl font-bold text-blue-800 mb-4">Tamasha (Logged In)</h1>

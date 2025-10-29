@@ -12,26 +12,20 @@ export default function CallbackPage(): JSX.Element {
     const exchange = async () => {
       if (!code || !client_id) return;
 
-      try {
-        const res = await fetch('http://localhost:4000/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, client_id }),
-        });
+      const res = await fetch('http://localhost:4000/token', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, client_id }),
+      });
 
-        const data = await res.json();
-        localStorage.setItem('jazz_token', data.access_token);
-
-        // Notify opener (if any) and close popup
+      if (res.ok) {
         window.opener?.postMessage('login-success', '*');
         window.close();
-      } catch (err) {
-        console.error(err);
       }
     };
-
     exchange();
   }, [code, client_id]);
 
-  return <div className="p-4">Processing login…</div>;
+  return <div className="p-6 text-center">Completing login...</div>;
 }
