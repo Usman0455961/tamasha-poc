@@ -2,6 +2,7 @@
 
 import { getToken, fetchProducts } from '@/utils/auth';
 import { JSX, useEffect, useState } from 'react';
+import ProductList from '@/components/ProductList';
 
 export default function Home(): JSX.Element {
   const [products, setProducts] = useState<string[]>([]);
@@ -15,7 +16,8 @@ export default function Home(): JSX.Element {
       window.JazzAuth?.init({
         clientId: 'tamasha',  // or 'cricket'
         containerId: 'jazz-auth-container',
-        buttonColor: '#1d4ed8',
+        buttonColor: '#E2136E', // Jazz brand color
+        buttonText: 'Continue with Jazz',
         onLogin: () => {
           loadSession();  // Trigger reload
         },
@@ -40,24 +42,38 @@ export default function Home(): JSX.Element {
   }, []);
 
   if (loading) {
-    return <div className="p-8 text-center">Checking session...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (products.length > 0) {
     return (
-      <div className="p-8 max-w-md mx-auto bg-blue-50 rounded-xl">
-        <h1 className="text-2xl font-bold text-blue-800 mb-4">Tamasha (Logged In)</h1>
-        <ul className="space-y-2">
-          {products.map(p => <li key={p} className="bg-white p-3 rounded border">{p}</li>)}
-        </ul>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <img src="/jazz-logo.png" alt="Jazz Logo" className="h-12 mx-auto mb-4" />
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Welcome to Tamasha</h1>
+            <p className="text-lg text-gray-600">Your entertainment destination</p>
+          </div>
+          <ProductList products={products} />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-8 max-w-md mx-auto text-center">
-      <h1 className="text-2xl font-bold text-blue-800 mb-6">Tamasha POC</h1>
-      <div id="jazz-auth-container"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <img src="/jazz-logo.png" alt="Jazz Logo" className="h-16 mx-auto mb-6" />
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Tamasha</h1>
+          <p className="text-gray-600 mb-8">Sign in to access your entertainment</p>
+        </div>
+        <div id="jazz-auth-container" className="flex justify-center"></div>
+      </div>
     </div>
   );
 }
